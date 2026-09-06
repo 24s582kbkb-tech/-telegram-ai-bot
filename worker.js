@@ -13,24 +13,24 @@ export default {
 
         if (!query) {
           await answerInlineQuery(
-  update.inline_query.id,
-  results,
-  env.TG_TOKEN
-);
+            update.inline_query.id,
+            [],
+            env.TG_BOT
+          );
 
           return new Response("OK");
         }
 
-        const answers = await askAI(query);
+        const answers = await askAI(
+          query,
+          env.HF_TOKEN
+        );
 
         const results = answers.map((answer, index) => ({
           type: "article",
           id: String(index + 1),
-
           title: `Вариант ${index + 1}`,
-
           description: answer.slice(0, 200),
-
           input_message_content: {
             message_text: answer
           }
@@ -38,7 +38,8 @@ export default {
 
         await answerInlineQuery(
           update.inline_query.id,
-          results
+          results,
+          env.TG_BOT
         );
 
         return new Response("OK");
@@ -58,13 +59,25 @@ export default {
 
         if (text === "/start") {
           await sendTelegramMessage(
-  chatId,
-  "Привет! 🤖\n\nИспользуй меня в любом чате:\n\n@iishka_otvet_bot твой вопрос",
-  env.TG_TOKEN
-);
+            chatId,
+            "Привет! 🤖\n\nИспользуй меня в любом чате:\n\n@iishka_otvet_bot твой вопрос",
+            env.TG_BOT
+          );
 
           return new Response("OK");
         }
+
+        // Обычный вопрос в личном чате с ботом
+        const answers = await askAI(
+          text,
+          env.HF_TOKEN
+        );
+
+        await sendTelegramMessage(
+          chatId,
+          answers.join("\n\n"),
+          env.TG_BOT
+        );
 
         return new Response("OK");
       }
@@ -74,19 +87,20 @@ export default {
     } catch (error) {
       console.log("Worker error:", error);
 
-      return new Response("Internal Server Error", {
-        status: 500
-      });
+      return new Response(
+        "Internal Server Error",
+        { status: 500 }
+      );
     }
   }
 };
 
 
 // ========================================
-// AI
+// AI — создаёт 5 вариантов ответа
 // ========================================
 
-async function askAI(question) {
+async function askAI(question, hfToken) {
 
   const prompt = `
 Ты помощник для переписки в Telegram.
@@ -102,16 +116,11 @@ async function askAI(question) {
 - Не добавляй номера.
 - Не добавляй объяснения.
 - Не используй слово "Вариант".
-- Каждый ответ отделяй строкой ---
+- Каждый ответ отделяй отдельной строкой: ---
 - Ответы должны быть естественными.
-- Сделай варианты разными по стилю:
-  1. короткий
-  2. подробный
-  3. простой
-  4. уверенный
-  5. нейтральный
+- Сделай ответы разными по стилю.
 
-Верни только эти 5 вариантов.
+Верни только 5 ответов.
 `;
 
   const response = await fetch(
@@ -120,7 +129,7 @@ async function askAI(question) {
       method: "POST",
 
       headers: {
-        "Authorization": `Bearer ${HF_TOKEN}`,
+        "Authorization": `Bearer ${hfToken}`,
         "Content-Type": "application/json"
       },
 
@@ -179,15 +188,16 @@ async function askAI(question) {
 
 
 // ========================================
-// TELEGRAM — INLINE
+// TELEGRAM — INLINE MODE
 // ========================================
 
 async function answerInlineQuery(
   inlineQueryId,
-  results
+  results,
+  botToken
 ) {
   await fetch(
-    `https://api.telegram.org/bot${TG_TOKEN}/answerInlineQuery`,
+    `https://api.telegram.org/bot${botToken}/answerInlineQuery`,
     {
       method: "POST",
 
@@ -207,15 +217,16 @@ async function answerInlineQuery(
 
 
 // ========================================
-// TELEGRAM — обычное сообщение
+// TELEGRAM — ОТПРАВКА СООБЩЕНИЯ
 // ========================================
 
 async function sendTelegramMessage(
   chatId,
-  text
+  text,
+  botToken
 ) {
   await fetch(
-    `https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,
+    `https://api.telegram.org/bot${botToken}/sendMessage`,
     {
       method: "POST",
 
