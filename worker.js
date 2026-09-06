@@ -36,7 +36,7 @@ export default {
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
-              model: "model: "openai/gpt-oss-120b",",
+  model: "openai/gpt-oss-120b",
               messages: [
                 {
                   role: "user",
