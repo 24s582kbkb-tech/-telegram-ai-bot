@@ -115,8 +115,8 @@ async function askAI(question) {
       error
     );
     return [
-      "Не удалось получить ответ от AI 😔"
-    ];
+  "ОШИБКА HF: " + error
+];
   }
   const data = await response.json();
   const content =
