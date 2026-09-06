@@ -1,3 +1,6 @@
+const BOT_TOKEN = "8233740982:AAHQyOqaXirTJrO8plOH0QPgMpvuDG2oBSQ";
+const HF_TOKEN = "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";
+
 export default {
   async fetch(request, env) {
     if (request.method !== "POST") {
@@ -7,7 +10,6 @@ export default {
     try {
       const update = await request.json();
 
-      // Обычное сообщение
       if (update.message) {
         const chatId = update.message.chat.id;
         const text = update.message.text;
@@ -16,11 +18,8 @@ export default {
           return new Response("OK");
         }
 
-        // Команда /start
         if (text === "/start") {
           await sendTelegramMessage(
-            env.BOT_TOKEN,
-            const BOT_TOKEN = "8233740982:AAHQyOqaXirTJrO8plOH0QPgMpvuDG2oBSQ";
             chatId,
             "Привет! 🤖 Я AI-бот. Напиши мне что-нибудь!"
           );
@@ -28,14 +27,12 @@ export default {
           return new Response("OK");
         }
 
-        // Запрос к Hugging Face
         const response = await fetch(
           "https://router.huggingface.co/v1/chat/completions",
           {
             method: "POST",
             headers: {
-              "Authorization": `Bearer ${env.HF_TOKEN}`,
-              HF_TOKEN = "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 const";
+              "Authorization": `Bearer ${HF_TOKEN}`,
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
@@ -56,8 +53,6 @@ export default {
           console.log("Hugging Face error:", error);
 
           await sendTelegramMessage(
-            env.BOT_TOKEN,
-            const BOT_TOKEN = "8233740982:AAHQyOqaXirTJrO8plOH0QPgMpvuDG2oBSQ";
             chatId,
             "Извини, сейчас я не могу ответить 😔"
           );
@@ -71,12 +66,7 @@ export default {
           data.choices?.[0]?.message?.content ||
           "Я не смог придумать ответ 😔";
 
-        await sendTelegramMessage(
-          env.BOT_TOKEN,
-          const BOT_TOKEN = "8233740982:AAHQyOqaXirTJrO8plOH0QPgMpvuDG2oBSQ";
-          chatId,
-          answer
-        );
+        await sendTelegramMessage(chatId, answer);
 
         return new Response("OK");
       }
@@ -93,10 +83,9 @@ export default {
   }
 };
 
-
-async function sendTelegramMessage(token, chatId, text) {
+async function sendTelegramMessage(chatId, text) {
   await fetch(
-    `https://api.telegram.org/bot${token}/sendMessage`,
+    `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
     {
       method: "POST",
       headers: {
