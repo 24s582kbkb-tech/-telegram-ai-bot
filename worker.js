@@ -1,6 +1,3 @@
-const BOT_TOKEN = "8233740982:AAHQyOqaXirTJrO8plOH0QPgMpvuDG2oBSQ";
-const HF_TOKEN = "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";
-
 export default {
   async fetch(request, env) {
     try {
@@ -16,9 +13,10 @@ export default {
 
         if (!query) {
           await answerInlineQuery(
-            update.inline_query.id,
-            []
-          );
+  update.inline_query.id,
+  results,
+  env.TG_TOKEN
+);
 
           return new Response("OK");
         }
@@ -60,9 +58,10 @@ export default {
 
         if (text === "/start") {
           await sendTelegramMessage(
-            chatId,
-            "Привет! 🤖\n\nИспользуй меня в любом чате:\n\n@iishka_otvet_bot твой вопрос"
-          );
+  chatId,
+  "Привет! 🤖\n\nИспользуй меня в любом чате:\n\n@iishka_otvet_bot твой вопрос",
+  env.TG_TOKEN
+);
 
           return new Response("OK");
         }
@@ -188,7 +187,7 @@ async function answerInlineQuery(
   results
 ) {
   await fetch(
-    `https://api.telegram.org/bot${BOT_TOKEN}/answerInlineQuery`,
+    `https://api.telegram.org/bot${TG_TOKEN}/answerInlineQuery`,
     {
       method: "POST",
 
@@ -216,7 +215,7 @@ async function sendTelegramMessage(
   text
 ) {
   await fetch(
-    `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
+    `https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,
     {
       method: "POST",
 
