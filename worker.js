@@ -20,6 +20,7 @@ export default {
         if (text === "/start") {
           await sendTelegramMessage(
             env.BOT_TOKEN,
+            8233740982:AAHQyOqaXirTJrO8plOH0QPgMpvuDG2oBSQ
             chatId,
             "Привет! 🤖 Я AI-бот. Напиши мне что-нибудь!"
           );
@@ -34,6 +35,7 @@ export default {
             method: "POST",
             headers: {
               "Authorization": `Bearer ${env.HF_TOKEN}`,
+              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
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
@@ -55,6 +57,7 @@ export default {
 
           await sendTelegramMessage(
             env.BOT_TOKEN,
+            8233740982:AAHQyOqaXirTJrO8plOH0QPgMpvuDG2oBSQ
             chatId,
             "Извини, сейчас я не могу ответить 😔"
           );
@@ -70,6 +73,7 @@ export default {
 
         await sendTelegramMessage(
           env.BOT_TOKEN,
+          8233740982:AAHQyOqaXirTJrO8plOH0QPgMpvuDG2oBSQ
           chatId,
           answer
         );
