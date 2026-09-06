@@ -85,13 +85,14 @@ export default {
       return new Response("OK");
 
     } catch (error) {
-      console.log("Worker error:", error);
+  console.error("WORKER ERROR:", error.message);
+  console.error(error.stack);
 
-      return new Response(
-        "Internal Server Error",
-        { status: 500 }
-      );
-    }
+  return new Response(
+    "ERROR: " + error.message,
+    { status: 500 }
+  );
+}
   }
 };
 
