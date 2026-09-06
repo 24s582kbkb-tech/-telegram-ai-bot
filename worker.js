@@ -96,7 +96,7 @@ async function askAI(question) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "openai/gpt-oss-120b",
+        model: "openai/gpt-oss-120b:fastest",
         messages: [
           {
             role: "user",
