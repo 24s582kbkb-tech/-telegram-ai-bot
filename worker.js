@@ -35,7 +35,7 @@ export default {
             method: "POST",
             headers: {
               "Authorization": `Bearer ${env.HF_TOKEN}`,
-              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
+              HF_TOKEN = "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 const";
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
