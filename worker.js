@@ -1,5 +1,5 @@
 const BOT_TOKEN = "8233740982:AAHQyOqaXirTJrO8plOH0QPgMpvuDG2oBSQ";
-const HF_TOKEN = "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";
+const HF_TOKEN = "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";
 export default {
   async fetch(request, env) {
     try {
