@@ -149,17 +149,13 @@ async function askAI(question, hfToken) {
   );
 
   if (!response.ok) {
-    const error = await response.text();
+  const error = await response.text();
+  console.log("Hugging Face error:", error);
 
-    console.log(
-      "Hugging Face error:",
-      error
-    );
-
-    return [
-      "Не удалось получить ответ от AI 😔"
-    ];
-  }
+  return [
+    "ОШИБКА HF: " + error
+  ];
+}
 
   const data = await response.json();
 
