@@ -54,8 +54,9 @@ export default {
 
           await sendTelegramMessage(
             chatId,
-            "Извини, сейчас я не могу ответить 😔"
-          );
+            "Ошибка Hugging Face: " + error
+
+  );
 
           return new Response("OK");
         }
