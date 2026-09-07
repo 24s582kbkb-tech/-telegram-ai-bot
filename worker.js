@@ -23,7 +23,7 @@ export default {
 
         const answers = await askAI(
           query,
-          env.HF_TOKEN
+          env.OPEN_KEY
         );
 
         const results = answers.map((answer, index) => ({
@@ -67,10 +67,9 @@ export default {
           return new Response("OK");
         }
 
-        // Обычный вопрос в личном чате с ботом
         const answers = await askAI(
           text,
-          env.HF_TOKEN
+          env.OPEN_KEY
         );
 
         await sendTelegramMessage(
@@ -85,57 +84,55 @@ export default {
       return new Response("OK");
 
     } catch (error) {
-  console.error("WORKER ERROR:", error.message);
-  console.error(error.stack);
+      console.log("Worker error:", error);
 
-  return new Response(
-    "ERROR: " + error.message,
-    { status: 500 }
-  );
-}
+      return new Response(
+        "Internal Server Error",
+        { status: 500 }
+      );
+    }
   }
 };
 
 
 // ========================================
-// AI — создаёт 5 вариантов ответа
+// OPENROUTER AI
 // ========================================
 
-async function askAI(question, hfToken) {
+async function askAI(question, apiKey) {
 
   const prompt = `
 Ты помощник для переписки в Telegram.
 
-Пользователь спрашивает:
+Пользователь написал:
 
 "${question}"
 
 Создай 5 разных готовых вариантов ответа.
 
 Правила:
-- Каждый вариант должен быть самостоятельным сообщением.
+- Каждый вариант должен быть самостоятельным готовым сообщением.
 - Не добавляй номера.
 - Не добавляй объяснения.
-- Не используй слово "Вариант".
-- Каждый ответ отделяй отдельной строкой: ---
-- Ответы должны быть естественными.
-- Сделай ответы разными по стилю.
+- Не пиши слово "Вариант".
+- Каждый ответ отделяй строкой: ---
+- Ответы должны быть разными по стилю.
 
 Верни только 5 ответов.
 `;
 
   const response = await fetch(
-    "https://router.huggingface.co/v1/chat/completions",
+    "https://openrouter.ai/api/v1/chat/completions",
     {
       method: "POST",
 
       headers: {
-        "Authorization": `Bearer ${hfToken}`,
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
 
       body: JSON.stringify({
-        model: "openai/gpt-oss-120b:fastest",
+        model: "openrouter/free",
 
         messages: [
           {
@@ -150,13 +147,17 @@ async function askAI(question, hfToken) {
   );
 
   if (!response.ok) {
-  const error = await response.text();
-  console.log("Hugging Face error:", error);
+    const error = await response.text();
 
-  return [
-    "ОШИБКА HF: " + error
-  ];
-}
+    console.log(
+      "OpenRouter error:",
+      error
+    );
+
+    return [
+      "ОШИБКА AI: " + error
+    ];
+  }
 
   const data = await response.json();
 
@@ -185,7 +186,7 @@ async function askAI(question, hfToken) {
 
 
 // ========================================
-// TELEGRAM — INLINE MODE
+// TELEGRAM INLINE
 // ========================================
 
 async function answerInlineQuery(
@@ -214,7 +215,7 @@ async function answerInlineQuery(
 
 
 // ========================================
-// TELEGRAM — ОТПРАВКА СООБЩЕНИЯ
+// TELEGRAM MESSAGE
 // ========================================
 
 async function sendTelegramMessage(
